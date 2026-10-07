@@ -1,33 +1,404 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-lang="ko">
 <head>
   <meta charset="utf-8">
+  <script>
+    (function () {
+      var lang = "ko";
+      try {
+        var stored = localStorage.getItem("starry-lang");
+        if (stored === "ko" || stored === "en") lang = stored;
+        else {
+          var first = (navigator.languages && navigator.languages[0]) || navigator.language || "";
+          lang = first.toLowerCase().indexOf("ko") === 0 ? "ko" : "en";
+        }
+      } catch (e) {
+        lang = "ko";
+      }
+      document.documentElement.lang = lang;
+      document.documentElement.setAttribute("data-lang", lang);
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>StarryStudio — Ochi</title>
-  <meta name="description" content="StarryStudio / Ochi — indie apps and games.">
+  <title>StarryStudio</title>
+  <meta name="description" content="StarryStudio — 오치의 1인 스튜디오. A one-person studio by Ochi. Pixel Tarot, Moss Idle (이끼 키우기), and Mac apps.">
+  <link rel="canonical" href="https://ochichan.github.io/">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#12141c" media="(prefers-color-scheme: dark)">
+  <meta property="og:title" content="StarryStudio">
+  <meta property="og:description" content="A one-person studio by Ochi. 오치의 1인 스튜디오.">
+  <meta property="og:url" content="https://ochichan.github.io/">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='1.35' fill='%237a756c'/%3E%3C/svg%3E">
   <style>
-    :root { color-scheme: light dark; }
-    body { font-family: system-ui, -apple-system, sans-serif; max-width: 40rem;
-           margin: 3rem auto; padding: 0 1.25rem; line-height: 1.55; }
-    h1 { font-size: 1.5rem; font-weight: 650; margin-bottom: 0.35rem; }
-    .sub { opacity: 0.75; margin-bottom: 1.75rem; }
-    ul { padding-left: 1.2rem; }
-    a { color: inherit; }
-    footer { margin-top: 2.5rem; font-size: 0.9rem; opacity: 0.7; }
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f1ea;
+      --ink: #1c1a17;
+      --muted: #5a554c;
+      --line: #ddd6cb;
+      --glow: rgba(176, 186, 206, 0.45);
+      --serif: "Iowan Old Style", Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #12141c;
+        --ink: #ece8e1;
+        --muted: #b3aea4;
+        --line: #2c303c;
+        --glow: rgba(92, 112, 158, 0.22);
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse 90% 42% at 50% -12%, var(--glow), transparent 62%),
+        var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 1.0625rem;
+      line-height: 1.65;
+    }
+    .wrap {
+      max-width: 40rem;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 4.5rem;
+    }
+    a {
+      color: inherit;
+      text-underline-offset: 0.18em;
+      text-decoration-thickness: 1px;
+    }
+    a:hover { text-decoration-thickness: 2px; }
+    :focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: 3px;
+    }
+    .skip {
+      position: absolute;
+      left: 0.75rem;
+      top: 0.75rem;
+      transform: translateY(-160%);
+      background: var(--ink);
+      color: var(--bg);
+      padding: 0.55rem 0.8rem;
+      z-index: 2;
+    }
+    .skip:focus { transform: none; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 3.25rem;
+    }
+    .mark {
+      display: block;
+      color: var(--muted);
+    }
+    .lang-switch {
+      display: flex;
+      gap: 0.35rem;
+    }
+    .lang-switch button {
+      appearance: none;
+      font: inherit;
+      font-size: 0.92rem;
+      color: var(--ink);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      min-height: 44px;
+      cursor: pointer;
+    }
+    html[data-lang="ko"] [data-set-lang="ko"],
+    html[data-lang="en"] [data-set-lang="en"] {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+    }
+    html[data-lang="ko"] .en,
+    html[data-lang="en"] .ko { display: none; }
+    h1 {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: clamp(2.7rem, 8vw, 3.85rem);
+      letter-spacing: -0.03em;
+      line-height: 1.02;
+      margin: 0 0 1rem;
+    }
+    .lede {
+      margin: 0 0 2.75rem;
+      font-size: 1.125rem;
+      max-width: 36em;
+      text-wrap: pretty;
+    }
+    h2 {
+      margin: 0 0 0.35rem;
+      font-size: 0.92rem;
+      font-weight: 650;
+      color: var(--muted);
+    }
+    .products {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .product {
+      display: grid;
+      gap: 0.35rem;
+      padding: 1.35rem 0 1.45rem;
+      border-top: 1px solid var(--line);
+    }
+    .product-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.75rem 1.25rem;
+      flex-wrap: wrap;
+    }
+    .product h3 {
+      font-family: var(--serif);
+      font-size: 1.45rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin: 0;
+    }
+    .status {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    .aka,
+    .blurb,
+    .out { margin: 0; text-wrap: pretty; }
+    .aka { color: var(--muted); }
+    .blurb { margin-top: 0.3rem; }
+    .out {
+      margin-top: 0.7rem;
+      overflow-wrap: anywhere;
+    }
+    .contact {
+      border-top: 1px solid var(--line);
+      margin-top: 0.25rem;
+      padding-top: 1.5rem;
+    }
+    .mail {
+      margin: 0.85rem 0 0;
+    }
+    .mail a {
+      font-family: var(--serif);
+      font-size: 1.28rem;
+      letter-spacing: -0.02em;
+    }
+    .also {
+      margin: 0.8rem 0 0;
+      color: var(--muted);
+    }
+    .also a { color: inherit; }
+    footer {
+      margin-top: 3rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
   </style>
+  <noscript>
+    <style>
+      .ko, .en { display: block !important; }
+      .lang-switch { display: none !important; }
+    </style>
+  </noscript>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "StarryStudio",
+    "url": "https://ochichan.github.io/",
+    "email": "dev@starry-studio.net",
+    "founder": {
+      "@type": "Person",
+      "name": "Chisung Oh",
+      "alternateName": ["Ochi", "Ochichan", "오치성"]
+    }
+  }
+  </script>
 </head>
 <body>
-  <h1>StarryStudio</h1>
-  <p class="sub">Indie apps by Ochi (Ochichan).</p>
-  <p>1인 스튜디오 StarryStudio의 공개 페이지입니다. Play Console·AdMob 등 개발자 계정 인증과
-     앱 정책 문서에 사용합니다.</p>
-  <h2>Apps</h2>
-  <ul>
-    <li><a href="https://ochichan.github.io/moss-idle-site/">이끼 키우기 (Moss Idle)</a></li>
-    <li><a href="https://pixeltarot.app">픽셀타로 (Pixel Tarot)</a></li>
-  </ul>
-  <h2>Contact</h2>
-  <p><a href="https://github.com/Ochichan">github.com/Ochichan</a></p>
-  <footer>© StarryStudio / Ochi</footer>
+  <a class="skip" href="#content">
+    <span class="ko" lang="ko">본문으로</span>
+    <span class="en" lang="en">Skip to content</span>
+  </a>
+  <div class="wrap">
+    <header>
+      <svg class="mark" width="52" height="16" viewBox="0 0 52 16" aria-hidden="true">
+        <circle cx="3" cy="9" r="1.15" fill="currentColor"/>
+        <circle cx="14" cy="4.5" r="0.7" fill="currentColor"/>
+        <circle cx="24" cy="11" r="1.05" fill="currentColor"/>
+        <circle cx="36" cy="6" r="1.35" fill="currentColor"/>
+        <circle cx="48" cy="12" r="0.65" fill="currentColor"/>
+      </svg>
+      <nav class="lang-switch" aria-label="Language">
+        <button type="button" data-set-lang="ko" lang="ko" aria-pressed="true">한국어</button>
+        <button type="button" data-set-lang="en" lang="en" aria-pressed="false">English</button>
+      </nav>
+    </header>
+
+    <main id="content">
+      <h1>StarryStudio</h1>
+      <p class="lede">
+        <span class="ko" lang="ko">오치(Ochichan, 오치성)가 혼자 운영하며, 작은 게임과 Mac 앱을 만듭니다.</span>
+        <span class="en" lang="en">Ochi (Ochichan, Chisung Oh) runs this studio alone and makes small games and Mac apps.</span>
+      </p>
+
+      <section id="work" aria-labelledby="work-heading">
+        <h2 id="work-heading">
+          <span class="ko" lang="ko">작업</span>
+          <span class="en" lang="en">Work</span>
+        </h2>
+        <ul class="products">
+          <li class="product">
+            <div class="product-head">
+              <h3>
+                <span class="ko" lang="ko">픽셀타로</span>
+                <span class="en" lang="en">Pixel Tarot</span>
+              </h3>
+              <p class="status">
+                <span class="ko" lang="ko">사이트</span>
+                <span class="en" lang="en">Site</span>
+              </p>
+            </div>
+            <p class="aka">
+              <span class="ko" lang="ko">운명 던전</span>
+              <span class="en" lang="en">픽셀타로 · 운명 던전</span>
+            </p>
+            <p class="blurb">
+              <span class="ko" lang="ko">레트로 게임 방식의 타로 가게입니다. 하루 한 번의 리딩은 무료이고, 광고 없이 볼 수 있습니다.</span>
+              <span class="en" lang="en">A retro-game style tarot shop. One reading a day is free, with no ads.</span>
+            </p>
+            <p class="out"><a href="https://pixeltarot.app">pixeltarot.app</a></p>
+          </li>
+
+          <li class="product">
+            <div class="product-head">
+              <h3>
+                <span class="ko" lang="ko">이끼 키우기</span>
+                <span class="en" lang="en">Moss Idle</span>
+              </h3>
+              <p class="status">
+                <span class="ko" lang="ko">사이트</span>
+                <span class="en" lang="en">Site</span>
+              </p>
+            </div>
+            <p class="aka">
+              <span class="ko" lang="ko">Moss Idle · Tiny Terrarium</span>
+              <span class="en" lang="en">Tiny Terrarium · 이끼 키우기</span>
+            </p>
+            <p class="blurb">
+              <span class="ko" lang="ko">아무것도 하지 않아도 자라는 작은 테라리움입니다. Android용 방치형 이끼 키우기.</span>
+              <span class="en" lang="en">A tiny terrarium that grows on its own. An idle moss game for Android.</span>
+            </p>
+            <p class="out"><a href="https://ochichan.github.io/moss-idle-site/">ochichan.github.io/moss-idle-site</a></p>
+          </li>
+
+          <li class="product">
+            <div class="product-head">
+              <h3>LectureWhisper</h3>
+              <p class="status">Mac</p>
+            </div>
+            <p class="blurb">
+              <span class="ko" lang="ko">Mac에서 쓰는 로컬 우선 학습 도우미입니다. 강의 녹음, 교수 발화에 맞춘 받아쓰기, 노트, 검색, 복습을 Mac 안에서 처리합니다.</span>
+              <span class="en" lang="en">A local-first macOS learning assistant. Lecture recording, professor-focused transcription, notes, search, and review stay on the Mac.</span>
+            </p>
+          </li>
+
+          <li class="product">
+            <div class="product-head">
+              <h3>LectureSession</h3>
+              <p class="status">
+                <span class="ko" lang="ko">준비 중</span>
+                <span class="en" lang="en">In progress</span>
+              </p>
+            </div>
+            <p class="blurb">
+              <span class="ko" lang="ko">강의 작업을 잇는 동반 앱으로 이른 단계에 있습니다.</span>
+              <span class="en" lang="en">An early companion for the lecture workflow. Still in progress.</span>
+            </p>
+          </li>
+
+          <li class="product">
+            <div class="product-head">
+              <h3>Loupe</h3>
+              <p class="status">Mac</p>
+            </div>
+            <p class="blurb">
+              <span class="ko" lang="ko">문서 버전 사이의 변화를 Mac에서 살펴보는 로컬 우선 앱입니다. 근거를 곁들인 의미 비교를 기기 안에서 분석합니다.</span>
+              <span class="en" lang="en">A local-first macOS app for reviewing what changed between document versions. Semantic diff with evidence, analyzed on the Mac.</span>
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <section class="contact" id="contact" aria-labelledby="contact-heading">
+        <h2 id="contact-heading">
+          <span class="ko" lang="ko">연락</span>
+          <span class="en" lang="en">Contact</span>
+        </h2>
+        <p class="mail"><a href="mailto:dev@starry-studio.net">dev@starry-studio.net</a></p>
+        <p class="also"><a href="https://github.com/Ochichan">github.com/Ochichan</a></p>
+      </section>
+    </main>
+
+    <footer>© StarryStudio</footer>
+    <p id="lang-status" class="visually-hidden" aria-live="polite"></p>
+  </div>
+
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var buttons = document.querySelectorAll("[data-set-lang]");
+      var status = document.getElementById("lang-status");
+
+      function apply(lang, fromUser) {
+        if (lang !== "ko" && lang !== "en") lang = "ko";
+        root.lang = lang;
+        root.setAttribute("data-lang", lang);
+        buttons.forEach(function (btn) {
+          btn.setAttribute("aria-pressed", btn.getAttribute("data-set-lang") === lang ? "true" : "false");
+        });
+        try { localStorage.setItem("starry-lang", lang); } catch (e) {}
+        if (fromUser && status) status.textContent = lang === "ko" ? "한국어" : "English";
+      }
+
+      buttons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          apply(btn.getAttribute("data-set-lang"), true);
+        });
+      });
+
+      apply(root.getAttribute("data-lang") === "en" ? "en" : "ko", false);
+    })();
+  </script>
 </body>
 </html>
